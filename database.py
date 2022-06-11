@@ -1,4 +1,4 @@
-from sqlalchemy import Column, ForeignKey, Integer, String, create_engine
+from sqlalchemy import Column, Float, ForeignKey, Integer, String, DateTime, TupleType, create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.orm import declarative_base
 from sqlalchemy_utils import database_exists, create_database
@@ -19,18 +19,25 @@ Base = declarative_base()
 class User(Base):
     __tablename__ = 'users'
     id = Column(Integer, primary_key=True)
-    name = Column(String())
+    name = Column(String(), unique=True)
     email = Column(String())
     password = Column(String())
-    devices = Column(Integer())
+    timestamp = Column(DateTime())
     
-class Device(Base):
-    __tablename__ = 'devices'
+class UserIncomeIndex(Base):
+    __tablename__ = 'userIncomeIndex'
     id = Column(Integer, primary_key=True)
     user = Column(ForeignKey('users.id'))
+    income = Column(Float())
+    incomeIndex = Column(Float())
+    spendingType = Column(ForeignKey('spending_types.id'))
+    
+class SpendingType(Base):
+    __tablename__ = 'spendingTypes'
+    id = Column(Integer, primary_key=True)
+    type = Column(Integer())
     name = Column(String())
     description = Column(String())
-    powerConsupmption = Column(String())
-    timestamp = Column(String())
+    recommendedSpendingRatio = Column(TupleType(Float, Float, Float))
 
 Base.metadata.create_all(bind=engine)

@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from auth import CreateToken, CredentialsAreFree, CredentialsAreTrue
+from auth import CalculateUserAxis, CreateToken, CredentialsAreFree, CredentialsAreTrue
 from database import User, session as db
 from schemes import Token, CredentialSchema
 from auth import context
@@ -39,6 +39,11 @@ async def login(data: CredentialSchema):
         return {'code':200,'message':'User logged in successfully','token':token}
     return {'code':401,'message':'Wrong Credentials','token':None}
 
-@app.post("/users/{name}/devices")
-async def devicesList(name: str, data: Token):
-    return {'code':200,'message':'Devices list','devices':db.execute(f"SELECT * FROM devices WHERE user = :user",{'user':name})}
+@app.post('/users/{name}/get')
+async def getUser(data:Token):
+    return {'userdata':db.execute(f"SELECT * FROM users WHERE name = :name",{'name':data.name})}
+
+@app.post('/users/{name}/budgetCalculate')
+async def budgetCalculate(data:Token):
+    CalculateUserAxis(data.name,data.income,data.questions)
+    return {''}

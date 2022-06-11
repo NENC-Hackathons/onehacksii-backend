@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import List, Optional
 from pydantic import BaseModel
 
 class CredentialSchema(BaseModel):
@@ -8,3 +8,8 @@ class CredentialSchema(BaseModel):
 
 class Token(BaseModel):
     token: str
+
+class BudgetSchema(BaseModel):
+    name: str
+    income: float
+    questions: List[int]

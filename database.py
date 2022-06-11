@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Float, ForeignKey, Integer, String, DateTime, TupleType, create_engine
+from sqlalchemy import Column, Float, ForeignKey, Integer, String, DateTime, ARRAY, create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.orm import declarative_base
 from sqlalchemy_utils import database_exists, create_database
@@ -30,7 +30,7 @@ class UserIncomeIndex(Base):
     user = Column(ForeignKey('users.id'))
     income = Column(Float())
     incomeIndex = Column(Float())
-    spendingType = Column(ForeignKey('spending_types.id'))
+    spendingType = Column(ForeignKey('spendingTypes.id'))
     
 class SpendingType(Base):
     __tablename__ = 'spendingTypes'
@@ -38,6 +38,6 @@ class SpendingType(Base):
     type = Column(Integer())
     name = Column(String())
     description = Column(String())
-    recommendedSpendingRatio = Column(TupleType(Float, Float, Float))
+    recommendedSpendingRatio = Column(ARRAY(Float))
 
 Base.metadata.create_all(bind=engine)

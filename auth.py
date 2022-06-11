@@ -1,5 +1,4 @@
 from datetime import timedelta,datetime
-from multiprocessing.pool import ApplyResult
 from jose import jwt
 from passlib.context import CryptContext
 from config import secret
@@ -12,8 +11,12 @@ def CredentialsAreFree(email:str,name:str):
         return False
     return True
 
+def HashPassword(password:str):
+    return context.hash(password)
+
 def CredentialsAreTrue(name:str,password:str):
-    if db.execute(f"SELECT * FROM users WHERE name = :name AND password = :password",{'name':name,'password':context.hash(password)}).length > 0:
+    areTrue = db.execute(f"SELECT * FROM users WHERE name = :name AND password = :password",{'name':name,'password':context.hash(password)}) 
+    if db.fetchall().length > 0:
         return True
     return False
 
@@ -37,6 +40,6 @@ def CalculateUserAxis(name:str,income:float,questions:list):
         multiplier = 0.5
     elif income < 25000.0:
         multiplier = 0.25
-    appendValue = sum(questions)/5/2*multiplier
-    
+    spendingIndex = sum(questions)/5/2*multiplier
+    spendingPercentages = () # wants(clothes,cars,electronics,vanity items, etc..)/needs(bills,food,utilities,etc..)/investments(stocks,real estate,etc..)
     return

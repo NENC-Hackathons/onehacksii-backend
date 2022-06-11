@@ -11,8 +11,8 @@ passlib==1.7.4
 pyasn1==0.4.8
 pycparser==2.21
 pydantic==1.9.1
+PyJWT==2.4.0
 python-dotenv==0.20.0
-python-jose==3.3.0
 rsa==4.8
 six==1.16.0
 sniffio==1.2.0

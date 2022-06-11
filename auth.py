@@ -1,5 +1,5 @@
 from datetime import timedelta,datetime
-from jose import jwt
+import jwt
 from passlib.context import CryptContext
 from config import secret
 from database import session as db
@@ -7,7 +7,8 @@ from database import session as db
 context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 def CredentialsAreFree(email:str,name:str):
-    if db.execute(f"SELECT * FROM users WHERE email = :email OR name = :name",{'email':email,'name':name}).length > 0:
+    areFree = db.execute(f"SELECT * FROM users WHERE email = :email OR name = :name",{'email':email,'name':name}).fetchall()
+    if len(areFree) > 0:
         return False
     return True
 
@@ -15,8 +16,8 @@ def HashPassword(password:str):
     return context.hash(password)
 
 def CredentialsAreTrue(name:str,password:str):
-    areTrue = db.execute(f"SELECT * FROM users WHERE name = :name AND password = :password",{'name':name,'password':context.hash(password)}) 
-    if db.fetchall().length > 0:
+    areTrue = db.execute(f"SELECT * FROM users WHERE name = :name AND password = :password",{'name':name,'password':context.hash(password)}).fetchall()
+    if len(areTrue) > 0:
         return True
     return False
 

@@ -1,9 +1,9 @@
 from datetime import datetime
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from auth import CalculateUserAxis, CreateToken, CredentialsAreFree, CredentialsAreTrue, DecodeToken, HashPassword
+from auth import CalculateUserAxis, CreateToken, CredentialsAreFree, CredentialsAreTrue, GetUserByToken, HashPassword
 from database import User, session as db
-from schemes import Token, CredentialSchema
+from schemes import BudgetSchema, Token, CredentialSchema
 
 app = FastAPI()
 
@@ -41,11 +41,12 @@ async def login(data: CredentialSchema):
 
 @app.post('/users/{name}/get')
 async def getUser(data:Token):
-    data = DecodeToken(data.token)
-    if data and data['exp'] > datetime.utcnow():
-        return {'userdata':db.execute(f"SELECT * FROM users WHERE name = :name",{'name':data['name']})}
+    user = GetUserByToken(data.token)
+    return { 'code':200,'message':'User found','user':user}
 
 @app.post('/users/{name}/budgetCalculate')
-async def budgetCalculate(data:Token):
+async def budgetCalculate(data:BudgetSchema):
+    data = GetUserByToken(data.token)
+    
     CalculateUserAxis(data.name,data.income,data.questions)
     return {}

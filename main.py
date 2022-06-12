@@ -29,15 +29,15 @@ async def register(data: CredentialSchema):
         except:
             db.rollback()
         token = CreateToken(data.username)
-        return {'code':200,'message':'User created successfully','token':token}
-    return {'code':400,'message':'User already exists','token':None}
+        return {'code':200,'message':'User created successfully','token':token,'username':data.username}
+    return {'code':400,'message':'User already exists','token':None,'username':None}
 
 @app.post("/users/login")
 async def login(data: CredentialSchema):
     if CredentialsAreTrue(data.username,data.password):
         token = CreateToken(data.username)
-        return {'code':200,'message':'User logged in successfully','token':token}
-    return {'code':401,'message':'Wrong Credentials','token':None}
+        return {'code':200,'message':'User logged in successfully','token':token,'username':data.username}
+    return {'code':401,'message':'Wrong Credentials','token':None,'username':None}
 
 @app.post('/users/{name}/get')
 async def getUser(data:Token):

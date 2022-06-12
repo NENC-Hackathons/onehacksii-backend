@@ -1,5 +1,5 @@
 from datetime import timedelta,datetime
-import jwt
+from jwt import encode, decode
 from passlib.context import CryptContext
 from config import secret
 from database import session as db
@@ -27,20 +27,21 @@ def CreateToken(name:str):
         'iat': datetime.utcnow(),
         'name': name
     }
-    return jwt.encode(payload, secret, algorithm='HS256')
+    return encode(payload, secret, algorithm='HS256')
 
 def DecodeToken(token:str):
-    return jwt.decode(token, secret, algorithms=['HS256'])
+    return decode(token, secret, algorithms=['HS256'])
 
-def CalculateUserAxis(name:str,income:float,questions:list):
-    startValue = 0.5
-    multiplier = 1
-    if income < 500000.0 and income >= 80000.0:
-        multiplier = 0.75
-    elif income < 80000.0 and income >= 25000.0:
-        multiplier = 0.5
-    elif income < 25000.0:
-        multiplier = 0.25
-    spendingIndex = sum(questions)/5/2*multiplier
-    spendingPercentages = () # wants(clothes,cars,electronics,vanity items, etc..)/needs(bills,food,utilities,etc..)/investments(stocks,real estate,etc..)
+def CalculateUserAxis(name:str,income:int,questions:list):
+    multiplier = calculateIncomeIndex(income)
+    spendingIndex = sum(questions)/5/2*multiplier #based on the 5 question answers it returns the average number of the array then multiplies it by the income index to get the spending index that is based on the income
+    spendingPercentages(spendingIndex) # wants(clothes,cars,electronics,vanity items, etc..)/needs(bills,food,utilities,etc..)/investments(stocks,real estate,etc..)
+    return
+
+def calculateIncomeIndex(income:int):
+    return income/500000
+
+def spendingPercentages(spendingIndex:float):
+    savings = spendingIndex * 0.95
+    #1  = needs + wants + savings
     return

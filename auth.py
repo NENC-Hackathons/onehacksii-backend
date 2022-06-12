@@ -38,16 +38,11 @@ def GetUserByToken(token:str):
             return user
         return False
 
-def CalculateUserAxis(name:str,income:int,questions:list):
+def CalculateUserAxis(name:str,income:int,questionSum:int):
     multiplier = calculateIncomeIndex(income)
-    spendingIndex = sum(questions)/5/2*multiplier #based on the 5 question answers it returns the average number of the array then multiplies it by the income index to get the spending index that is based on the income
-    spendingPercentages(spendingIndex) # wants(clothes,cars,electronics,vanity items, etc..)/needs(bills,food,utilities,etc..)/investments(stocks,real estate,etc..)
+    spendingIndex = round(questionSum/6/2*multiplier,1)*10
+    
     return
 
 def calculateIncomeIndex(income:int):
     return income/500000
-
-def spendingPercentages(spendingIndex:float):
-    savings = spendingIndex * 0.95
-    #1  = needs + wants + savings
-    return

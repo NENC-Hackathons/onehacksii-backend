@@ -1,2 +1,3 @@
 # backend
-A backend api for our project
+
+A backend API for MoneyBuddy. 

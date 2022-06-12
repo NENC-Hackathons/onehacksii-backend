@@ -7,8 +7,8 @@ from database import session as db
 context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 def CredentialsAreFree(email:str,name:str):
-    areFree = db.execute(f"SELECT * FROM users WHERE email = :email OR name = :name",{'email':email,'name':name}).fetchall()
-    if len(areFree) > 0:
+    areFree = db.execute(f"SELECT * FROM users WHERE email = :email OR name = :name",{'email':email,'name':name})
+    for user in areFree:
         return False
     return True
 
@@ -16,9 +16,10 @@ def HashPassword(password:str):
     return context.hash(password)
 
 def CredentialsAreTrue(name:str,password:str):
-    areTrue = db.execute(f"SELECT * FROM users WHERE name = :name AND password = :password",{'name':name,'password':context.hash(password)}).fetchall()
-    if len(areTrue) > 0:
-        return True
+    areTrue = db.execute(f"SELECT * FROM users WHERE name = :name",{'name':name})
+    for user in areTrue:
+        if context.verify(password,user.password):
+            return True
     return False
 
 def CreateToken(name:str):

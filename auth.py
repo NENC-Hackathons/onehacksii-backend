@@ -30,8 +30,13 @@ def CreateToken(name:str):
     }
     return encode(payload, secret, algorithm='HS256')
 
-def DecodeToken(token:str):
-    return decode(token, secret, algorithms=['HS256'])
+def GetUserByToken(token:str):
+    data = decode(token, secret, algorithms=['HS256'])
+    if data['exp'] > datetime.utcnow():
+        user = db.execute(f"SELECT * FROM users WHERE name = :name",{'name':data['name']}).first()
+        if user:
+            return user
+        return False
 
 def CalculateUserAxis(name:str,income:int,questions:list):
     multiplier = calculateIncomeIndex(income)

@@ -11,5 +11,5 @@ class Token(BaseModel):
 
 class BudgetSchema(BaseModel):
     name: str
-    income: float
-    questions: List[int]
+    income: int
+    questionsSum: int

@@ -1,23 +1,24 @@
 from datetime import timedelta,datetime
+from operator import and_
 from jwt import encode, decode
 from passlib.context import CryptContext
 from config import secret
-from database import SpendingType, session as db
+from database import SpendingType, User, session as db
 
 context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 def CredentialsAreFree(email:str,name:str):
-    areFree = db.execute(f"SELECT * FROM users WHERE email = :email OR name = :name",{'email':email,'name':name}).fetchall()
-    if len(areFree) > 0:
-        return False
-    return True
+    areFree = db.execute(f"SELECT * FROM users WHERE email = :email OR name = :name",{'email':email,'name':name})
+    for user in areFree:
+        if user:
+            return False
 
 def HashPassword(password:str):
     return context.hash(password)
 
 def CredentialsAreTrue(name:str,password:str):
-    areTrue = db.execute(f"SELECT * FROM users WHERE name = :name AND password = :password",{'name':name,'password':context.hash(password)}).fetchall()
-    if len(areTrue) > 0:
+    areTrue = db.execute(f"SELECT * FROM users WHERE name = :name",{'name':name}).first()
+    if context.verify(password,areTrue.password):
         return True
     return False
 

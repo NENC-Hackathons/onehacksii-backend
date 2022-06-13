@@ -1,8 +1,8 @@
 from datetime import datetime
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from auth import CalculateUserAxis, CreateToken, CredentialsAreFree, CredentialsAreTrue, GetUserByToken, HashPassword
-from database import User, session as db
+from auth import CreateToken, CredentialsAreFree, CredentialsAreTrue, GetUserByToken, HashPassword, getBudgetSet, budgetSets
+from database import SpendingType, User, UserIncomeIndex, session as db
 from schemes import BudgetSchema, Token, CredentialSchema
 
 app = FastAPI()
@@ -18,7 +18,6 @@ allow_headers=["*"]
 @app.get("/")
 def main():
     return {"message": "Hello World"}
-
 @app.post("/users/register")
 async def register(data: CredentialSchema):
     if CredentialsAreFree(data.email,data.username):
@@ -46,7 +45,11 @@ async def getUser(data:Token):
 
 @app.post('/users/{name}/budgetCalculate')
 async def budgetCalculate(data:BudgetSchema):
-    data = GetUserByToken(data.token)
-    
-    CalculateUserAxis(data.name,data.income,data.questions)
-    return {}
+    user = db.execute(f"SELECT * FROM users WHERE name = :name",{'name':data.name}).first()
+    spendingIndex = getBudgetSet(data.income,data.questionsSum)
+    spending = db.query(SpendingType).filter(SpendingType.id == spendingIndex+2).first()
+    userIndex = UserIncomeIndex(user=user.id,income=data.income,spendingType=spending.id)
+    db.add(userIndex)
+    db.commit()
+    print(userIndex)
+    return {'code':200,'message':'Budget calculated successfully','income':data.income,'RecommendedspendingSchema':budgetSets[spendingIndex]}

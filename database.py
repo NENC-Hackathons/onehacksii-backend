@@ -30,12 +30,11 @@ class UserIncomeIndex(Base):
     user = Column(ForeignKey('users.id'))
     income = Column(Float())
     incomeIndex = Column(Float())
-    spendingType = Column(ForeignKey('spendingTypes.id'))
+    spendingType = Column(Integer())
     
 class SpendingType(Base):
     __tablename__ = 'spendingTypes'
     id = Column(Integer, primary_key=True)
-    type = Column(Integer())
     name = Column(String())
     description = Column(String())
     recommendedSpendingRatio = Column(ARRAY(Float))

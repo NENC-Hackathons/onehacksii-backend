@@ -1,4 +1,5 @@
 from datetime import datetime
+import math
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from auth import CreateToken, CredentialsAreFree, CredentialsAreTrue, GetUserByToken, HashPassword, getBudgetSet, budgetSets
@@ -21,7 +22,7 @@ def main():
 @app.post("/users/register")
 async def register(data: CredentialSchema):
     if CredentialsAreFree(data.email,data.username):
-        user = User(name=data.username,email=data.email,password=HashPassword(data.password))
+        user = User(name=data.username,email=data.email,password=HashPassword(data.password),timestamp=datetime.utcnow())
         try:
             db.add(user)
             db.commit()
@@ -42,9 +43,9 @@ async def login(data: CredentialSchema):
 async def getUser(data:Token):
     user = GetUserByToken(data.token)
     userIndex = db.execute(f"SELECT * FROM userIncomeIndex WHERE user = :id",{'id':user.id}).first()
-    spendingTypeOfUser = db.execute(f"SELECT * FROM spendingType WHERE user = :id",{'id':user.id}).first()
+    spendingTypeOfUser = db.execute(f"SELECT * FROM spendingType WHERE id = :id",{'id':userIndex.spendingType+1}).first()
     if userIndex and user and spendingTypeOfUser:
-        return { 'code':200,'message':'User found','user':user,'userIndex':userIndex,'spendingType':spendingTypeOfUser}
+        return { 'code':200,'message':'User found','user':user,'userIndex':userIndex}
     return { 'code':404,'message':'User not found','user':user,'userIndex':None,'spendingType':None}
 
 @app.post('/users/{name}/budgetCalculate')
@@ -55,4 +56,4 @@ async def budgetCalculate(data:BudgetSchema):
     userIndex = UserIncomeIndex(user=user.id,income=data.income,spendingType=spending.id)
     db.add(userIndex)
     db.commit()
-    return {'code':200,'message':'Budget calculated successfully','income':data.income,'RecommendedspendingSchema':budgetSets[spendingIndex]}
+    return {'code':200,'message':'Budget calculated successfully','income':data.income,'RecommendedspendingSchema':budgetSets[spendingIndex],'spendingType':budgetSets[math.random(0,len(budgetSets))]}

@@ -27,7 +27,7 @@ class User(Base):
 class UserIncomeIndex(Base):
     __tablename__ = 'userIncomeIndex'
     id = Column(Integer, primary_key=True)
-    user = Column(ForeignKey('users.id'))
+    user = Column(Integer())
     income = Column(Float())
     incomeIndex = Column(Float())
     spendingType = Column(Integer())

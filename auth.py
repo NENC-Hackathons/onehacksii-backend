@@ -32,11 +32,10 @@ def CreateToken(name:str):
 
 def GetUserByToken(token:str):
     data = decode(token, secret, algorithms=['HS256'])
-    if data['exp'] > datetime.utcnow():
-        user = db.execute(f"SELECT * FROM users WHERE name = :name",{'name':data['name']}).first()
-        if user:
-            return user
-        return False
+    user = db.query(User).filter(User.name == data['name']).first()
+    if user:
+        return user
+    return False
 
 def getBudgetSet(income:int,questionSum:int):
     multiplier = calculateIncomeIndex(income)

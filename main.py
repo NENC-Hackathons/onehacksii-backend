@@ -41,7 +41,11 @@ async def login(data: CredentialSchema):
 @app.post('/users/{name}/get')
 async def getUser(data:Token):
     user = GetUserByToken(data.token)
-    return { 'code':200,'message':'User found','user':user}
+    userIndex = db.execute(f"SELECT * FROM userIncomeIndex WHERE user = :id",{'id':user.id}).first()
+    spendingTypeOfUser = db.execute(f"SELECT * FROM spendingType WHERE user = :id",{'id':user.id}).first()
+    if userIndex and user and spendingTypeOfUser:
+        return { 'code':200,'message':'User found','user':user,'userIndex':userIndex,'spendingType':spendingTypeOfUser}
+    return { 'code':404,'message':'User not found','user':user,'userIndex':None,'spendingType':None}
 
 @app.post('/users/{name}/budgetCalculate')
 async def budgetCalculate(data:BudgetSchema):
@@ -51,5 +55,4 @@ async def budgetCalculate(data:BudgetSchema):
     userIndex = UserIncomeIndex(user=user.id,income=data.income,spendingType=spending.id)
     db.add(userIndex)
     db.commit()
-    print(userIndex)
     return {'code':200,'message':'Budget calculated successfully','income':data.income,'RecommendedspendingSchema':budgetSets[spendingIndex]}
